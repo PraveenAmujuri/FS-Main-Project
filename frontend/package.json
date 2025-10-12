@@ -1,0 +1,13 @@
+{
+  "name": "student-frontend",
+  "version": "1.0.0",
+  "main": "src/index.jsx",
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "scripts": {
+    "start": "vite",
+    "dev": "vite"
+  }
+}

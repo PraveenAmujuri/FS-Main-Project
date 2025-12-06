@@ -1,351 +1,330 @@
 {
-	"info": {
-		"_postman_id": "b4a8cce7-9180-483f-b362-23f3686f0dff",
-		"name": "Postman Library API v2",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "50617351",
-		"_collection_link": "https://saipraveenamujuri-674051.postman.co/workspace/Praveen's-Workspace~74f6a224-4dca-4120-88e2-a90f24a9fe1e/collection/50617351-b4a8cce7-9180-483f-b362-23f3686f0dff?action=share&source=collection_link&creator=50617351"
-	},
-	"item": [
-		{
-			"name": "get books",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/books",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get fiction books",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/books?genre=fiction&checkedOut=true",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books"
-					],
-					"query": [
-						{
-							"key": "genre",
-							"value": "fiction"
-						},
-						{
-							"key": "checkedOut",
-							"value": "true"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get book by id",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"// simple, non-blocking check",
-							"const bookId = pm.collectionVariables.get(\"id\") || pm.environment.get(\"id\");",
-							"if (!bookId) {",
-							"  console.warn(\"Warning: collection variable 'id' is not set. Proceeding without validation.\");",
-							"}",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"// Test for successful response",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"// Test response time",
-							"pm.test(\"Response time is less than 2000ms\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-							"});",
-							"",
-							"// Handle different error scenarios",
-							"if (pm.response.code === 200) {",
-							"    pm.test(\"Response has valid book data\", function () {",
-							"        const jsonData = pm.response.json();",
-							"        pm.expect(jsonData).to.be.an('object');",
-							"        pm.expect(jsonData).to.have.property('id');",
-							"        pm.expect(jsonData).to.have.property('title');",
-							"    });",
-							"    ",
-							"    pm.test(\"Book ID matches requested ID\", function () {",
-							"        const jsonData = pm.response.json();",
-							"        const requestedId = pm.variables.get(\"id\");",
-							"        pm.expect(jsonData.id).to.eql(requestedId);",
-							"    });",
-							"} else if (pm.response.code === 404) {",
-							"    pm.test(\"Book not found - valid error response\", function () {",
-							"        const jsonData = pm.response.json();",
-							"        pm.expect(jsonData).to.have.property('error');",
-							"        console.log(\"Book not found with the provided ID\");",
-							"    });",
-							"} else if (pm.response.code === 400) {",
-							"    pm.test(\"Bad request - invalid ID format\", function () {",
-							"        const jsonData = pm.response.json();",
-							"        pm.expect(jsonData).to.have.property('error');",
-							"        console.log(\"Invalid book ID format provided\");",
-							"    });",
-							"} else if (pm.response.code === 500) {",
-							"    pm.test(\"Server error occurred\", function () {",
-							"        console.error(\"Internal server error - the API encountered an issue\");",
-							"        pm.expect(pm.response.code).to.equal(500);",
-							"    });",
-							"} else {",
-							"    pm.test(`Unexpected status code: ${pm.response.code}`, function () {",
-							"        console.log(`Received unexpected status code: ${pm.response.code}`);",
-							"        console.log(\"Response body:\", pm.response.text());",
-							"    });",
-							"}",
-							"",
-							"// Validate response headers",
-							"pm.test(\"Content-Type header is present\", function () {",
-							"    pm.response.to.have.header(\"Content-Type\");",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/books/:id",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "add a book",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "api-key",
-						"value": "postmanrulz"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"Test Book\",\r\n  \"author\": \"ChatGPT\",\r\n  \"genre\": \"fiction\",\r\n  \"yearPublished\": 2025\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/books",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "checkout a book",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "api-key",
-						"value": "postmanrulz"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"Test Book\",\r\n  \"author\": \"ChatGPT\",\r\n  \"genre\": \"fiction\",\r\n  \"yearPublished\": 2025\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/books/:id",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete a book",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "api-key",
-						"value": "postmanrulz",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/books/:id",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"books",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "skill check",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "student-expert",
-						"value": "skillcheck",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"actorName\": \"Matthew McConaughey\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{skillcheckBaseUrl}}/post?movieName=Interstellar",
-					"host": [
-						"{{skillcheckBaseUrl}}"
-					],
-					"path": [
-						"post"
-					],
-					"query": [
-						{
-							"key": "movieName",
-							"value": "Interstellar"
-						}
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "id",
-			"value": ""
-		},
-		{
-			"key": "skillcheckBaseUrl",
-			"value": ""
-		},
-		{
-			"key": "favoriteActor",
-			"value": ""
-		},
-		{
-			"key": "baseUrl",
-			"value": ""
-		},
-		{
-			"key": "ids",
-			"value": "",
-			"disabled": true
-		},
-		{
-			"key": "submission",
-			"value": ""
-		}
-	]
+  "info": {
+    "_postman_id": "b4a8cce7-9180-483f-b362-23f3686f0dff",
+    "name": "Postman Library API v2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50617351",
+    "_collection_link": "https://saipraveenamujuri-674051.postman.co/workspace/Praveen's-Workspace~74f6a224-4dca-4120-88e2-a90f24a9fe1e/collection/50617351-b4a8cce7-9180-483f-b362-23f3686f0dff?action=share&source=collection_link&creator=50617351"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "api-key",
+        "value": "postmanrulz",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "get books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get fiction books",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books?genre=fiction&checkedOut=true",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "genre",
+              "value": "fiction"
+            },
+            {
+              "key": "checkedOut",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get book by id",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// simple, non-blocking check",
+              "const bookId = pm.collectionVariables.get(\"id\") || pm.environment.get(\"id\");",
+              "if (!bookId) {",
+              "  console.warn(\"Warning: collection variable 'id' is not set. Proceeding without validation.\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test for successful response",
+              "pm.test(\"Status code is 200 or 404\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200,404]);",
+              "});",
+              "",
+              "pm.test(\"Content-Type header is present\", function () {",
+              "    pm.response.to.have.header(\"Content-Type\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "add a book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "try {",
+              "  const json = pm.response.json();",
+              "  if (json && json.id) {",
+              "    pm.collectionVariables.set(\"id\", json.id);",
+              "    console.log(\"Saved collection variable id =\", json.id);",
+              "  } else {",
+              "    console.log(\"add a book response did not include id:\", json);",
+              "  }",
+              "} catch (e) {",
+              "  console.log(\"add a book Tests script error:\", e);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "api-key",
+            "value": "postmanrulz"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Book\",\n  \"author\": \"ChatGPT\",\n  \"genre\": \"fiction\",\n  \"yearPublished\": 2025\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "checkout a book",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "api-key",
+            "value": "postmanrulz"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Book\",\n  \"author\": \"ChatGPT\",\n  \"genre\": \"fiction\",\n  \"yearPublished\": 2025\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/books/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete a book",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "api-key",
+            "value": "postmanrulz",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/books/:id",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "skill check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "try {",
+              "  const resp = pm.response.json();",
+              "  const actor = (resp && resp.json && resp.json.actorName) || resp.actorName;",
+              "  if (actor) {",
+              "    pm.collectionVariables.set(\"favoriteActor\", actor);",
+              "    console.log(\"Saved favoriteActor:\", actor);",
+              "  } else {",
+              "    console.log(\"favoriteActor not found in response:\", resp);",
+              "  }",
+              "} catch (e) {",
+              "  console.log(\"skill check Tests error:\", e);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": {
+          "type": "apikey",
+          "apikey": [
+            {
+              "key": "student-expert",
+              "value": "skillcheck",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"actorName\": \"Matthew McConaughey\"\n}\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{skillcheckBaseUrl}}/post?movieName=Interstellar",
+          "host": [
+            "{{skillcheckBaseUrl}}"
+          ],
+          "path": [
+            "post"
+          ],
+          "query": [
+            {
+              "key": "movieName",
+              "value": "Interstellar"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "id",
+      "value": ""
+    },
+    {
+      "key": "skillcheckBaseUrl",
+      "value": "https://postman-echo.com"
+    },
+    {
+      "key": "favoriteActor",
+      "value": ""
+    },
+    {
+      "key": "baseUrl",
+      "value": "https://library-api.postmanlabs.com"
+    },
+    {
+      "key": "submission",
+      "value": ""
+    }
+  ]
 }

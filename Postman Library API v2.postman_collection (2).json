@@ -40,7 +40,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/books?genre=fiction&checkedOut=true",
+          "raw": "{{baseUrl}}/books?genre=fiction&checkedOut=false",
           "host": [
             "{{baseUrl}}"
           ],
@@ -54,7 +54,7 @@
             },
             {
               "key": "checkedOut",
-              "value": "true"
+              "value": "false"
             }
           ]
         }
@@ -266,7 +266,13 @@
       ],
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "student-expert",
+            "value": "skillcheck",
+            "type": "text"
+          }
+        ],
         "auth": {
           "type": "apikey",
           "apikey": [
